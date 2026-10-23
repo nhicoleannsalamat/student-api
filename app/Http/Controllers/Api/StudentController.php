@@ -1,19 +1,23 @@
 <?php
 
-namespace App\Providers;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
+use App\Http\Controllers\Controller;
+use App\Models\Student;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
-class AppServiceProvider extends ServiceProvider
+class StudentController extends Controller
 {
-    public function register(): void
+    // GET /api/students
+    public function index()
     {
-        //
+        return response()->json(Student::latest()->get());
     }
 
-    public function boot(): void
+    // GET /api/students/{student}
+    public function show(Student $student)
     {
-        Schema::defaultStringLength(191);
+        return response()->json($student);
     }
 }
