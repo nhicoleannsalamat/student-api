@@ -34,4 +34,26 @@ class StudentController extends Controller
 
         return response()->json($student, 201);
     }
+
+    public function update(Request $request, Student $student)
+    {
+        $validated = $request->validate([
+            'student_number' => [
+                'required', 'string', 'max:50',
+                Rule::unique('students', 'student_number')->ignore($student->id),
+            ],
+            'first_name' => 'required|string|max:100',
+            'last_name'  => 'required|string|max:100',
+            'email'      => [
+                'required', 'email', 'max:255',
+                Rule::unique('students', 'email')->ignore($student->id),
+            ],
+            'course'     => 'required|string|max:100',
+            'year_level' => 'required|integer|between:1,6',
+        ]);
+
+        $student->update($validated);
+
+        return response()->json($student);
+    }
 }
