@@ -6,4 +6,6 @@ use App\Http\Controllers\Api\StudentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::apiResource('students', StudentController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('students', StudentController::class);
+});
