@@ -13,7 +13,7 @@ const inputs = [
     { name: 'last_name', label: 'Last Name', type: 'text' },
     { name: 'email', label: 'Email', type: 'email' },
     { name: 'course', label: 'Course', type: 'text' },
-    { name: 'year_level', label: 'Year Level (1 to 6)', type: 'number' },
+    { name: 'year_level', label: 'Year Level (1 to 4)', type: 'number', min: 1, max: 4 },
 ];
 
 const formData = reactive({
@@ -67,6 +67,8 @@ async function handleSave() {
                 <input
                     v-model="formData[input.name]"
                     :type="input.type"
+                    :min="input.min"
+                    :max="input.max"
                     :class="{ 'input-bad': fieldErrors[input.name] }"
                 />
                 <small v-if="fieldErrors[input.name]" class="err-text">{{ fieldErrors[input.name][0] }}</small>
