@@ -1,8 +1,8 @@
 * { box-sizing: border-box; }
-body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f0f7f6; color: #1f2937; }
+body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f5f3ff; color: #1f2937; }
 .page { max-width: 980px; margin: 0 auto; padding: 24px 16px; }
 .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.topbar h1 { margin: 0; color: #0f766e; font-size: 24px; }
+.topbar h1 { margin: 0; color: #7c3aed; font-size: 24px; }
 .user-info { display: flex; gap: 10px; align-items: center; font-size: 14px; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 8px; gap: 10px; flex-wrap: wrap; }
 .toolbar h2 { margin: 0; font-size: 18px; }
@@ -16,14 +16,14 @@ body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f0f7f
 
 label { font-size: 14px; font-weight: bold; margin-top: 6px; display: block; }
 input { width: 100%; padding: 9px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; margin-top: 4px; }
-input:focus { outline: 2px solid #99f6e4; border-color: #0f766e; }
+input:focus { outline: 2px solid #ddd6fe; border-color: #8b5cf6; }
 .input-bad { border-color: #dc2626; }
 .err-text { color: #dc2626; font-size: 12px; display: block; margin-top: 2px; }
 
 .button { padding: 8px 14px; border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; cursor: pointer; font-size: 14px; }
-.button:hover { background: #f1f5f9; }
-.button-main { background: #0f766e; border-color: #0f766e; color: #fff; }
-.button-main:hover { background: #115e59; }
+.button:hover { background: #f5f3ff; }
+.button-main { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
+.button-main:hover { background: #7c3aed; }
 .login-panel .button-main { margin-top: 10px; }
 .button-danger { background: #dc2626; border-color: #dc2626; color: #fff; }
 .button-danger:hover { background: #b91c1c; }
@@ -36,9 +36,9 @@ input:focus { outline: 2px solid #99f6e4; border-color: #0f766e; }
 
 .table-box { overflow-x: auto; background: #fff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0,0,0,.1); }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th { background: #0f766e; color: #fff; text-align: left; padding: 10px; }
+th { background: #8b5cf6; color: #fff; text-align: left; padding: 10px; }
 td { padding: 10px; border-bottom: 1px solid #e5e7eb; }
-tr:hover td { background: #f0fdfa; }
+tr:hover td { background: #f5f3ff; }
 td.no-data { text-align: center; color: #6b7280; padding: 24px; }
 .row-actions { display: flex; gap: 6px; }
 
