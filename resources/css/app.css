@@ -1,11 +1,49 @@
-@import 'tailwindcss';
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f0f7f6; color: #1f2937; }
+.page { max-width: 980px; margin: 0 auto; padding: 24px 16px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.topbar h1 { margin: 0; color: #0f766e; font-size: 24px; }
+.user-info { display: flex; gap: 10px; align-items: center; font-size: 14px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 8px; gap: 10px; flex-wrap: wrap; }
+.toolbar h2 { margin: 0; font-size: 18px; }
+.toolbar-right { display: flex; gap: 8px; align-items: center; }
+.search { width: 240px; margin-top: 0; }
+.hint { color: #6b7280; font-size: 14px; }
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+.panel { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 5px rgba(0,0,0,.1); }
+.login-panel { max-width: 380px; margin: 40px auto; display: flex; flex-direction: column; gap: 6px; }
+.login-panel h2 { margin-top: 0; }
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
+label { font-size: 14px; font-weight: bold; margin-top: 6px; display: block; }
+input { width: 100%; padding: 9px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; margin-top: 4px; }
+input:focus { outline: 2px solid #99f6e4; border-color: #0f766e; }
+.input-bad { border-color: #dc2626; }
+.err-text { color: #dc2626; font-size: 12px; display: block; margin-top: 2px; }
+
+.button { padding: 8px 14px; border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.button:hover { background: #f1f5f9; }
+.button-main { background: #0f766e; border-color: #0f766e; color: #fff; }
+.button-main:hover { background: #115e59; }
+.login-panel .button-main { margin-top: 10px; }
+.button-danger { background: #dc2626; border-color: #dc2626; color: #fff; }
+.button-danger:hover { background: #b91c1c; }
+.button-sm { padding: 5px 10px; font-size: 13px; }
+.button:disabled { opacity: .6; cursor: not-allowed; }
+
+.banner { padding: 10px 14px; border-radius: 6px; font-size: 14px; margin: 10px 0; }
+.banner-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.banner-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+.table-box { overflow-x: auto; background: #fff; border-radius: 10px; box-shadow: 0 1px 5px rgba(0,0,0,.1); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { background: #0f766e; color: #fff; text-align: left; padding: 10px; }
+td { padding: 10px; border-bottom: 1px solid #e5e7eb; }
+tr:hover td { background: #f0fdfa; }
+td.no-data { text-align: center; color: #6b7280; padding: 24px; }
+.row-actions { display: flex; gap: 6px; }
+
+.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal-box { width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; }
+.modal-box h2 { margin-top: 0; }
+.form-row { margin-bottom: 8px; }
+.modal-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
