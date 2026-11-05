@@ -5,7 +5,7 @@ body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f5f3f
 .topbar h1 { margin: 0; color: #7c3aed; font-size: 24px; }
 .user-info { display: flex; gap: 10px; align-items: center; font-size: 14px; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 8px; gap: 10px; flex-wrap: wrap; }
-.toolbar h2 { margin: 0; font-size: 18px; }
+.toolbar h2 { margin: 0; font-size: 18px; color: #7c3aed; }
 .toolbar-right { display: flex; gap: 8px; align-items: center; }
 .search { width: 240px; margin-top: 0; }
 .hint { color: #6b7280; font-size: 14px; }

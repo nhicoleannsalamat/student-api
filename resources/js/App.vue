@@ -57,7 +57,7 @@ async function handleLogout() {
     try {
         await apiRequest('/logout', { method: 'POST' });
     } catch (e) {
-        // ituloy ang logout bisan mo-error
+
     }
     clearSession();
     currentUser.value = null;
@@ -114,7 +114,7 @@ onMounted(() => {
 
         <template v-else>
             <div class="toolbar">
-                <h2>Students</h2>
+                <h2>Student List</h2>
                 <div class="toolbar-right">
                     <input v-model="searchText" class="search" type="text" placeholder="Search name, number, course..." />
                     <button v-if="isAdmin" class="button button-main" @click="openAddModal">+ Add Student</button>
