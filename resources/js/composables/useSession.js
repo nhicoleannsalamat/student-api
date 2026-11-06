@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue';
-import { request, getUser, getToken, setSession, clearSession } from '../api';
+import { apiRequest as request, getUser, getToken, saveSession as setSession, clearSession } from '../lib/http';
 
 const currentUser = ref(getUser());
 const token = ref(getToken());

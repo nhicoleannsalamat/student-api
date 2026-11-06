@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue';
-import { request } from '../api';
+import { apiRequest as request } from '../lib/http';
 
 const records = ref([]);
 const isLoadingRecords = ref(false);

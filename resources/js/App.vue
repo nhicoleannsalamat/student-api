@@ -99,25 +99,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container">
-        <header>
-            <h1>Student Management</h1>
-            <div v-if="isLoggedIn" class="user-box">
-                <span>{{ currentUser.name }}</span>
-                <span class="badge" :class="isAdmin ? 'badge-admin' : 'badge-user'">{{ roleLabel }}</span>
-                <button class="btn small" :disabled="isSigningOut" @click="handleSignOut">
+    <div class="page">
+        <header class="topbar">
+            <h1>Student Records Manager</h1>
+            <div v-if="isLoggedIn" class="user-info">
+                <span>{{ currentUser.name }} ({{ roleLabel }})</span>
+                <button class="button button-sm" :disabled="isSigningOut" @click="handleSignOut">
                     {{ isSigningOut ? 'Logging out...' : 'Logout' }}
                 </button>
             </div>
         </header>
 
-        <p v-if="alertBox" class="alert" :class="alertBox.type">{{ alertBox.text }}</p>
+        <p v-if="alertBox" class="banner" :class="'banner-' + alertBox.type">{{ alertBox.text }}</p>
 
         <SignInForm v-if="!isLoggedIn" @signed-in="onSignedIn" />
 
         <template v-else>
             <div class="toolbar">
-                <h2>Student Records</h2>
+                <h2>Student List</h2>
                 <div class="toolbar-right">
                     <input
                         v-model="searchText"
@@ -125,14 +124,14 @@ onMounted(() => {
                         type="text"
                         placeholder="Search name, number, course..."
                     />
-                    <button v-if="isAdmin" class="btn primary" @click="openAdd">+ Add Student</button>
+                    <button v-if="isAdmin" class="button button-main" @click="openAdd">+ Add Student</button>
                 </div>
             </div>
 
-            <p v-if="!isAdmin" class="note">You are logged in as a Regular User (view only).</p>
+            <p v-if="!isAdmin" class="hint">You are logged in as a Regular User (view only).</p>
             <p class="count">Showing {{ filteredRecords.length }} of {{ records.length }} students</p>
 
-            <p v-if="isLoadingRecords" class="note"><span class="spinner"></span>Loading records...</p>
+            <p v-if="isLoadingRecords" class="hint"><span class="spinner"></span>Loading records...</p>
             <StudentList
                 v-else
                 :records="filteredRecords"

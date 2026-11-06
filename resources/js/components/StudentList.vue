@@ -8,13 +8,13 @@ defineEmits(['edit', 'remove']);
 </script>
 
 <template>
-    <div class="table-wrap">
+    <div class="table-box">
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Student No.</th>
-                    <th>Name</th>
+                    <th>Full Name</th>
                     <th>Email</th>
                     <th>Course</th>
                     <th>Year</th>
@@ -23,7 +23,7 @@ defineEmits(['edit', 'remove']);
             </thead>
             <tbody>
                 <tr v-if="records.length === 0">
-                    <td :colspan="isAdmin ? 7 : 6" class="empty">No student records found.</td>
+                    <td :colspan="isAdmin ? 7 : 6" class="no-data">No student records found.</td>
                 </tr>
                 <tr v-for="s in records" :key="s.id">
                     <td>{{ s.id }}</td>
@@ -32,11 +32,13 @@ defineEmits(['edit', 'remove']);
                     <td>{{ s.email }}</td>
                     <td>{{ s.course }}</td>
                     <td>{{ s.year_level }}</td>
-                    <td v-if="isAdmin" class="actions">
-                        <button class="btn small" :disabled="deletingId === s.id" @click="$emit('edit', s)">Edit</button>
-                        <button class="btn small danger" :disabled="deletingId === s.id" @click="$emit('remove', s)">
-                            {{ deletingId === s.id ? 'Deleting...' : 'Delete' }}
-                        </button>
+                    <td v-if="isAdmin">
+                        <div class="row-actions">
+                            <button class="button button-sm" :disabled="deletingId === s.id" @click="$emit('edit', s)">Edit</button>
+                            <button class="button button-sm button-danger" :disabled="deletingId === s.id" @click="$emit('remove', s)">
+                                {{ deletingId === s.id ? 'Deleting...' : 'Delete' }}
+                            </button>
+                        </div>
                     </td>
                 </tr>
             </tbody>

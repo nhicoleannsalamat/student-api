@@ -74,26 +74,26 @@ async function submit() {
 </script>
 
 <template>
-    <div class="overlay" @click.self="$emit('cancel')">
-        <form class="card modal" novalidate @submit.prevent="submit">
+    <div class="backdrop" @click.self="$emit('cancel')">
+        <form class="panel modal-box" novalidate @submit.prevent="submit">
             <h2>{{ isEdit ? 'Edit Student' : 'Add Student' }}</h2>
-            <p v-if="formError" class="alert error">{{ formError }}</p>
+            <p v-if="formError" class="banner banner-error">{{ formError }}</p>
 
-            <div v-for="f in fields" :key="f.key" class="field">
+            <div v-for="f in fields" :key="f.key" class="form-row">
                 <label :for="f.key">{{ f.label }}</label>
                 <input
                     :id="f.key"
                     v-model="form[f.key]"
                     :type="f.type"
-                    :class="{ invalid: errors[f.key] }"
+                    :class="{ 'input-bad': errors[f.key] }"
                     @input="clearFieldError(f.key)"
                 />
-                <small v-if="errors[f.key]" class="field-error">{{ errors[f.key][0] }}</small>
+                <small v-if="errors[f.key]" class="err-text">{{ errors[f.key][0] }}</small>
             </div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn" :disabled="isSaving" @click="$emit('cancel')">Cancel</button>
-                <button type="submit" class="btn primary" :disabled="isSaving">
+            <div class="modal-buttons">
+                <button type="button" class="button" :disabled="isSaving" @click="$emit('cancel')">Cancel</button>
+                <button type="submit" class="button button-main" :disabled="isSaving">
                     <span v-if="isSaving" class="spinner"></span>
                     {{ isSaving ? 'Saving...' : 'Save' }}
                 </button>

@@ -69,5 +69,5 @@ td.no-data { text-align: center; color: #6b7280; padding: 24px; }
     vertical-align: middle;
     margin-right: 6px;
 }
-.btn.primary .spinner { border-color: rgba(255,255,255,.4); border-top-color: #fff; }
+.button-main .spinner { border-color: rgba(255,255,255,.4); border-top-color: #fff; }
 @keyframes spin { to { transform: rotate(360deg); } }

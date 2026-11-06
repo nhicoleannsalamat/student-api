@@ -19,34 +19,31 @@ async function submit() {
 </script>
 
 <template>
-    <form class="card login" novalidate @submit.prevent="submit">
-        <h2>Login</h2>
-        <p v-if="signInError" class="alert error">{{ signInError }}</p>
+    <form class="panel login-panel" novalidate @submit.prevent="submit">
+        <h2>Sign In</h2>
+        <p v-if="signInError" class="banner banner-error">{{ signInError }}</p>
 
         <label for="email">Email</label>
         <input
             id="email"
             v-model="email"
             type="email"
-            placeholder="Enter your email"
-            :class="{ invalid: signInFieldErrors.email }"
+            placeholder="admin@example.com"
             @input="clearSignInErrors"
         />
-        <small v-if="signInFieldErrors.email" class="field-error">{{ signInFieldErrors.email[0] }}</small>
+        <small v-if="signInFieldErrors.email" class="err-text">{{ signInFieldErrors.email[0] }}</small>
 
         <label for="password">Password</label>
         <input
             id="password"
             v-model="password"
             type="password"
-            :class="{ invalid: signInFieldErrors.password }"
             @input="clearSignInErrors"
         />
-        <small v-if="signInFieldErrors.password" class="field-error">{{ signInFieldErrors.password[0] }}</small>
+        <small v-if="signInFieldErrors.password" class="err-text">{{ signInFieldErrors.password[0] }}</small>
 
-        <button type="submit" class="btn primary" :disabled="isSigningIn">
-            <span v-if="isSigningIn" class="spinner"></span>
-            {{ isSigningIn ? 'Logging in...' : 'Login' }}
+        <button type="submit" class="button button-main" :disabled="isSigningIn">
+            {{ isSigningIn ? 'Signing in...' : 'Sign In' }}
         </button>
     </form>
 </template>
