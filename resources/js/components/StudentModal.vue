@@ -1,22 +1,25 @@
 <script setup>
-import { reactive, ref } from 'vue';
-import { apiRequest } from '../lib/http';
+import { reactive, ref, computed } from 'vue';
+import { useStudentRecords } from '../composables/useStudentRecords';
 
 const props = defineProps({
     student: { type: Object, default: null },
 });
-const emit = defineEmits(['saved', 'close']);
+const emit = defineEmits(['saved', 'cancel', 'failed']);
 
-const inputs = [
-    { name: 'student_number', label: 'Student Number', type: 'text' },
-    { name: 'first_name', label: 'First Name', type: 'text' },
-    { name: 'last_name', label: 'Last Name', type: 'text' },
-    { name: 'email', label: 'Email', type: 'email' },
-    { name: 'course', label: 'Course', type: 'text' },
-    { name: 'year_level', label: 'Year Level (1 to 4)', type: 'number', min: 1, max: 4 },
+const { addRecord, editRecord } = useStudentRecords();
+
+const fields = [
+    { key: 'student_number', label: 'Student Number', type: 'text' },
+    { key: 'first_name', label: 'First Name', type: 'text' },
+    { key: 'last_name', label: 'Last Name', type: 'text' },
+    { key: 'email', label: 'Email', type: 'email' },
+    { key: 'course', label: 'Course', type: 'text' },
+    { key: 'year_level', label: 'Year Level (1 to 6)', type: 'number' },
 ];
 
-const formData = reactive({
+
+const form = reactive({
     student_number: props.student?.student_number ?? '',
     first_name: props.student?.first_name ?? '',
     last_name: props.student?.last_name ?? '',
@@ -25,61 +28,76 @@ const formData = reactive({
     year_level: props.student?.year_level ?? '',
 });
 
-const fieldErrors = ref({});
-const errorText = ref('');
-const busy = ref(false);
+const errors = ref({});
+const formError = ref('');
+const isSaving = ref(false);
+const isEdit = computed(() => props.student !== null);
 
-async function handleSave() {
-    fieldErrors.value = {};
-    errorText.value = '';
-    busy.value = true;
+
+function clearFieldError(key) {
+    if (errors.value[key]) {
+        const copy = { ...errors.value };
+        delete copy[key];
+        errors.value = copy;
+    }
+}
+
+async function submit() {
+    errors.value = {};
+    formError.value = '';
+    isSaving.value = true;
 
     const payload = {
-        ...formData,
-        year_level: formData.year_level === '' ? null : Number(formData.year_level),
+        ...form,
+        year_level: form.year_level === '' ? null : Number(form.year_level),
     };
 
     try {
-        if (props.student) {
-            await apiRequest(`/students/${props.student.id}`, { method: 'PUT', body: payload });
-            emit('saved', 'Student record updated successfully.');
+        if (isEdit.value) {
+            await editRecord(props.student.id, payload);
+            emit('saved', 'Student updated successfully.');
         } else {
-            await apiRequest('/students', { method: 'POST', body: payload });
-            emit('saved', 'New student added successfully.');
+            await addRecord(payload);
+            emit('saved', 'Student added successfully.');
         }
     } catch (e) {
-        fieldErrors.value = e.errors;
-        errorText.value = e.status === 422 ? 'Please correct the highlighted fields.' : e.message;
+        if (e.status === 422) {
+            errors.value = e.errors;
+            formError.value = 'Please fix the errors below.';
+        } else {
+            emit('failed', e);
+        }
     } finally {
-        busy.value = false;
+        isSaving.value = false;
     }
 }
 </script>
 
 <template>
-    <div class="backdrop" @click.self="$emit('close')">
-        <div class="panel modal-box">
-            <h2>{{ student ? 'Edit Student' : 'Add New Student' }}</h2>
-            <p v-if="errorText" class="banner banner-error">{{ errorText }}</p>
+    <div class="overlay" @click.self="$emit('cancel')">
+        <form class="card modal" novalidate @submit.prevent="submit">
+            <h2>{{ isEdit ? 'Edit Student' : 'Add Student' }}</h2>
+            <p v-if="formError" class="alert error">{{ formError }}</p>
 
-            <div v-for="input in inputs" :key="input.name" class="form-row">
-                <label>{{ input.label }}</label>
+            <div v-for="f in fields" :key="f.key" class="field">
+                <label :for="f.key">{{ f.label }}</label>
                 <input
-                    v-model="formData[input.name]"
-                    :type="input.type"
-                    :min="input.min"
-                    :max="input.max"
-                    :class="{ 'input-bad': fieldErrors[input.name] }"
+                    :id="f.key"
+                    v-model="form[f.key]"
+                    :type="f.type"
+                    :class="{ invalid: errors[f.key] }"
+                    @input="clearFieldError(f.key)"
                 />
-                <small v-if="fieldErrors[input.name]" class="err-text">{{ fieldErrors[input.name][0] }}</small>
+                <small v-if="errors[f.key]" class="field-error">{{ errors[f.key][0] }}</small>
             </div>
 
-            <div class="modal-buttons">
-                <button class="button" @click="$emit('close')">Cancel</button>
-                <button class="button button-main" :disabled="busy" @click="handleSave">
-                    {{ busy ? 'Saving...' : 'Save' }}
+            <div class="modal-actions">
+                <button type="button" class="btn" :disabled="isSaving" @click="$emit('cancel')">Cancel</button>
+                <button type="submit" class="btn primary" :disabled="isSaving">
+                    <span v-if="isSaving" class="spinner"></span>
+                    {{ isSaving ? 'Saving...' : 'Save' }}
                 </button>
             </div>
-        </div>
+        </form>
     </div>
 </template>
