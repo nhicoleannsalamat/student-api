@@ -1,141 +1,153 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { apiRequest, getUser, clearSession } from './lib/http';
-import LoginPanel from './components/LoginPanel.vue';
+import { ref, onMounted } from 'vue';
+import { useSession } from './composables/useSession';
+import { useStudentRecords } from './composables/useStudentRecords';
+import { useAlerts } from './composables/useAlerts';
+import SignInForm from './components/SignInForm.vue';
 import StudentList from './components/StudentList.vue';
 import StudentModal from './components/StudentModal.vue';
 
-const currentUser = ref(getUser());
-const records = ref([]);
-const isLoading = ref(false);
-const banner = ref(null);
-const modalOpen = ref(false);
-const selected = ref(null);
-const searchText = ref('');
+const { currentUser, isLoggedIn, isAdmin, roleLabel, signOut, dropSession } = useSession();
+const {
+    records,
+    filteredRecords,
+    isLoadingRecords,
+    deletingId,
+    searchText,
+    fetchRecords,
+    deleteRecord,
+    clearRecords,
+} = useStudentRecords();
+const { alertBox, pushAlert } = useAlerts();
 
-const isAdmin = computed(() => currentUser.value?.role === 'admin');
+const showModal = ref(false);
+const selectedStudent = ref(null);
+const isSigningOut = ref(false);
 
-const filteredRecords = computed(() => {
-    const q = searchText.value.trim().toLowerCase();
-    if (!q) return records.value;
-    return records.value.filter((r) =>
-        `${r.first_name} ${r.last_name} ${r.student_number} ${r.course}`.toLowerCase().includes(q)
-    );
-});
 
-let bannerTimer = null;
-function showBanner(type, text) {
-    banner.value = { type, text };
-    clearTimeout(bannerTimer);
-    bannerTimer = setTimeout(() => (banner.value = null), 4000);
-}
-
-async function fetchRecords() {
-    isLoading.value = true;
-    try {
-        records.value = await apiRequest('/students');
-    } catch (e) {
-        if (e.status === 401) {
-            clearSession();
-            currentUser.value = null;
-            showBanner('error', 'Session expired. Please sign in again.');
-        } else {
-            showBanner('error', e.message);
-        }
-    } finally {
-        isLoading.value = false;
+function handleApiError(e) {
+    if (e.status === 401) {
+        dropSession();
+        clearRecords();
+        showModal.value = false;
+        pushAlert('error', 'Session expired. Please login again.');
+    } else if (e.status === 403) {
+        pushAlert('error', 'Access denied: you do not have permission to perform this action.');
+    } else {
+        pushAlert('error', e.message);
     }
 }
 
-function handleAuthenticated(user) {
-    currentUser.value = user;
-    showBanner('success', `Welcome, ${user.name}!`);
-    fetchRecords();
-}
-
-async function handleLogout() {
+async function loadList() {
     try {
-        await apiRequest('/logout', { method: 'POST' });
+        await fetchRecords();
     } catch (e) {
-
+        handleApiError(e);
     }
-    clearSession();
-    currentUser.value = null;
-    records.value = [];
-    searchText.value = '';
-    showBanner('success', 'You have been logged out.');
 }
 
-function openAddModal() {
-    selected.value = null;
-    modalOpen.value = true;
+async function onSignedIn() {
+    pushAlert('success', `Welcome, ${currentUser.value.name}!`);
+    await loadList();
 }
 
-function openEditModal(student) {
-    selected.value = student;
-    modalOpen.value = true;
+async function handleSignOut() {
+    isSigningOut.value = true;
+    await signOut();
+    clearRecords();
+    showModal.value = false;
+    isSigningOut.value = false;
+    pushAlert('success', 'Logged out successfully.');
 }
 
-function handleSaved(text) {
-    modalOpen.value = false;
-    showBanner('success', text);
-    fetchRecords();
+function openAdd() {
+    if (!isAdmin.value) return pushAlert('error', 'Only administrators can add students.');
+    selectedStudent.value = null;
+    showModal.value = true;
 }
 
-async function handleRemove(student) {
+function openEdit(student) {
+    if (!isAdmin.value) return pushAlert('error', 'Only administrators can edit students.');
+    selectedStudent.value = student;
+    showModal.value = true;
+}
+
+function onSaved(text) {
+    showModal.value = false;
+    pushAlert('success', text);
+}
+
+function onModalFailed(e) {
+    showModal.value = false;
+    handleApiError(e);
+}
+
+async function handleDelete(student) {
+    if (!isAdmin.value) return pushAlert('error', 'Only administrators can delete students.');
     if (!confirm(`Delete ${student.first_name} ${student.last_name}?`)) return;
     try {
-        const result = await apiRequest(`/students/${student.id}`, { method: 'DELETE' });
-        showBanner('success', result.message || 'Student deleted.');
-        fetchRecords();
+        const data = await deleteRecord(student.id);
+        pushAlert('success', data?.message || 'Student deleted successfully.');
     } catch (e) {
-        showBanner('error', e.message);
+        handleApiError(e);
     }
 }
 
 onMounted(() => {
-    if (currentUser.value) fetchRecords();
+    if (isLoggedIn.value) loadList();
 });
 </script>
 
 <template>
-    <div class="page">
-        <header class="topbar">
-            <h1>Student Records Manager</h1>
-            <div v-if="currentUser" class="user-info">
-                <span>{{ currentUser.name }} ({{ isAdmin ? 'Administrator' : 'Regular User' }})</span>
-                <button class="button button-sm" @click="handleLogout">Logout</button>
+    <div class="container">
+        <header>
+            <h1>Student Management</h1>
+            <div v-if="isLoggedIn" class="user-box">
+                <span>{{ currentUser.name }}</span>
+                <span class="badge" :class="isAdmin ? 'badge-admin' : 'badge-user'">{{ roleLabel }}</span>
+                <button class="btn small" :disabled="isSigningOut" @click="handleSignOut">
+                    {{ isSigningOut ? 'Logging out...' : 'Logout' }}
+                </button>
             </div>
         </header>
 
-        <p v-if="banner" class="banner" :class="'banner-' + banner.type">{{ banner.text }}</p>
+        <p v-if="alertBox" class="alert" :class="alertBox.type">{{ alertBox.text }}</p>
 
-        <LoginPanel v-if="!currentUser" @authenticated="handleAuthenticated" />
+        <SignInForm v-if="!isLoggedIn" @signed-in="onSignedIn" />
 
         <template v-else>
             <div class="toolbar">
-                <h2>Student List</h2>
+                <h2>Student Records</h2>
                 <div class="toolbar-right">
-                    <input v-model="searchText" class="search" type="text" placeholder="Search name, number, course..." />
-                    <button v-if="isAdmin" class="button button-main" @click="openAddModal">+ Add Student</button>
+                    <input
+                        v-model="searchText"
+                        class="search"
+                        type="text"
+                        placeholder="Search name, number, course..."
+                    />
+                    <button v-if="isAdmin" class="btn primary" @click="openAdd">+ Add Student</button>
                 </div>
             </div>
-            <p v-if="!isAdmin" class="hint">Signed in as a Regular User: view only.</p>
 
-            <p v-if="isLoading" class="hint">Loading records...</p>
+            <p v-if="!isAdmin" class="note">You are logged in as a Regular User (view only).</p>
+            <p class="count">Showing {{ filteredRecords.length }} of {{ records.length }} students</p>
+
+            <p v-if="isLoadingRecords" class="note"><span class="spinner"></span>Loading records...</p>
             <StudentList
                 v-else
                 :records="filteredRecords"
-                :can-manage="isAdmin"
-                @edit="openEditModal"
-                @remove="handleRemove"
+                :is-admin="isAdmin"
+                :deleting-id="deletingId"
+                @edit="openEdit"
+                @remove="handleDelete"
             />
 
             <StudentModal
-                v-if="modalOpen"
-                :student="selected"
-                @saved="handleSaved"
-                @close="modalOpen = false"
+                v-if="showModal"
+                :student="selectedStudent"
+                @saved="onSaved"
+                @cancel="showModal = false"
+                @failed="onModalFailed"
             />
         </template>
     </div>
